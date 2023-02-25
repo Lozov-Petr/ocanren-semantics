@@ -1,0 +1,35 @@
+(library
+ (name Compare_traces)
+ (modules compare_traces)
+ (libraries Stream Examples OCanren Semantics)
+ (preprocess
+  (pps ppx_inline_test ppx_expect))
+ (inline_tests))
+
+(library
+ (name OCanren)
+ (modules ocanren_trace ocanren_trace_tests)
+ (libraries Stream Examples)
+ (preprocess
+  (pps ppx_inline_test ppx_expect))
+ (inline_tests))
+
+(library
+ (name Semantics)
+ (modules semantics_trace semantics_trace_tests)
+ (libraries Stream Examples)
+ (preprocess
+  (pps ppx_inline_test ppx_expect))
+ (inline_tests))
+
+(library
+ (name Stream)
+ (modules stream)
+ (libraries GT)
+ (preprocess
+  (pps GT.ppx_all)))
+
+(library
+ (name Examples)
+ (modules examples)
+ (libraries Stream))
