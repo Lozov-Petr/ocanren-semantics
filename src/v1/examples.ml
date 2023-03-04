@@ -1,3 +1,4 @@
+open Substitution
 open Stream
 
 let appendo : relation =

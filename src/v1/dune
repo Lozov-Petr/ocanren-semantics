@@ -25,11 +25,11 @@
 (library
  (name Stream)
  (modules stream)
- (libraries GT)
+ (libraries GT Substitution)
  (preprocess
   (pps GT.ppx_all)))
 
 (library
  (name Examples)
  (modules examples)
- (libraries Stream))
+ (libraries Stream Substitution))
