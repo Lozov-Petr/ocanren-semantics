@@ -1,6 +1,3 @@
 (library
  (name Substitution)
- (modules substitution)
- (libraries GT)
- (preprocess
-  (pps GT.ppx_all)))
+ (modules substitution))

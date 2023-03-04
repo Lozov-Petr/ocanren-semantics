@@ -25,9 +25,7 @@
 (library
  (name Stream)
  (modules stream)
- (libraries GT Substitution)
- (preprocess
-  (pps GT.ppx_all)))
+ (libraries Substitution))
 
 (library
  (name Examples)
