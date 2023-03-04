@@ -1,3 +1,4 @@
+open Goal
 open Stream
 open OCanren
 open Semantics

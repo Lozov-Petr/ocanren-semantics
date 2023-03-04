@@ -9,7 +9,7 @@
 (library
  (name OCanren)
  (modules ocanren_trace ocanren_trace_tests)
- (libraries Stream Examples)
+ (libraries Stream Goal Examples)
  (preprocess
   (pps ppx_inline_test ppx_expect))
  (inline_tests))
@@ -25,7 +25,7 @@
 (library
  (name Stream)
  (modules stream)
- (libraries Substitution))
+ (libraries Substitution State Goal))
 
 (library
  (name Examples)

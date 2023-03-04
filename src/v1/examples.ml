@@ -1,5 +1,5 @@
 open Substitution
-open Stream
+open Goal
 
 let appendo : relation =
   ( "appendo",

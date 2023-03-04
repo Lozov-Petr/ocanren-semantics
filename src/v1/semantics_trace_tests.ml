@@ -1,3 +1,4 @@
+open Goal
 open Stream
 
 let%expect_test "" =

@@ -1,3 +1,13 @@
 (library
  (name Substitution)
  (modules substitution))
+
+(library
+ (name Goal)
+ (modules goal)
+ (libraries Substitution))
+
+(library
+ (name State)
+ (modules state)
+ (libraries Substitution))

@@ -1,4 +1,5 @@
 open Substitution
+open Goal
 open Stream
 
 let rec eval_step env =
