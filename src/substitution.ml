@@ -4,9 +4,31 @@ type term = Var of name | Sem_var of var | Constr of name * term list
 type subst = (var * term) list
 type state = subst * var
 
-let rec print_term fmt =
+let is_list = function
+  | Constr ("Nil", []) | Constr ("Cons", [ _; _ ]) -> true
+  | _ -> false
+
+let rec print_list fmt =
+  let open Format in
+  let rec print_l fmt = function
+    | Constr ("Nil", []) -> ()
+    | Constr ("Cons", [ hd; Constr ("Nil", []) ]) ->
+        fprintf fmt "; %a" print_term hd
+    | Constr ("Cons", [ hd; tl ]) ->
+        fprintf fmt "; %a%a" print_term hd print_l tl
+    | t -> fprintf fmt "; %a" print_term t
+    (* | t -> fprintf fmt " | %a" print_term t *)
+  in
+
+  function
+  | Constr ("Nil", []) -> fprintf fmt "[]"
+  | Constr ("Cons", [ hd; tl ]) -> fprintf fmt "[%a%a]" print_term hd print_l tl
+  | _ -> failwith "Unexpected term."
+
+and print_term fmt =
   let open Format in
   function
+  | (Constr ("Nil", []) | Constr ("Cons", [ _; _ ])) as t -> print_list fmt t
   | Sem_var v -> fprintf fmt "_.%d" v
   | Constr (name, []) -> fprintf fmt "%s" name
   | Constr (name, args) ->
@@ -73,3 +95,15 @@ let rec unify : term -> term -> subst -> subst option =
   | Constr _, Constr _ -> None
   | Var n, _ | _, Var n ->
       failwith @@ Format.sprintf "Unexpected syntax variable '%s' in unify" n
+
+let rec apply_subst : subst -> term -> term =
+ fun subst term ->
+  match term with
+  | Constr (n, args) -> Constr (n, List.map (apply_subst subst) args)
+  | Sem_var v -> (
+      match List.assoc_opt v subst with
+      | Some t -> apply_subst subst t
+      | None -> term)
+  | Var n ->
+      failwith
+      @@ Format.sprintf "Unexpected syntax variable '%s' in apply_subst" n

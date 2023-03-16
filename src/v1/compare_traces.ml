@@ -11,7 +11,7 @@ let compare_traces env goal =
 let%expect_test "" =
   let open Examples in
   Printf.printf "%B" @@ compare_traces [ appendo ] @@ fresh [ "q" ]
-  @@ invoke "appendo" [ list1; list2; Var "q" ];
+  @@ invoke "appendo" [ list12; list3; Var "q" ];
   [%expect {| true |}]
 
 let%expect_test "" =
@@ -26,7 +26,7 @@ let%expect_test "" =
   Printf.printf "%B"
   @@ compare_traces [ reverso; appendo ]
   @@ fresh [ "q" ]
-  @@ invoke "reverso" [ list1; Var "q" ];
+  @@ invoke "reverso" [ Var "q"; list12 ];
   [%expect {| true |}]
 
 let%expect_test "" =
@@ -34,5 +34,5 @@ let%expect_test "" =
   Printf.printf "%B"
   @@ compare_traces [ reverso; appendo ]
   @@ fresh [ "q" ]
-  @@ invoke "reverso" [ list3; Var "q" ];
+  @@ invoke "reverso" [ Var "q"; list3 ];
   [%expect {| true |}]

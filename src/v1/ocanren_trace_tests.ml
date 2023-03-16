@@ -4,7 +4,7 @@ open Stream
 let%expect_test "" =
   let open Examples in
   print_trace Ocanren_trace.eval [ appendo ] (-1)
-    (fresh [ "q" ] @@ invoke "appendo" [ list1; list2; Var "q" ]);
+    (fresh [ "q" ] @@ invoke "appendo" [ list12; list3; Var "q" ]);
   [%expect
     {|
     ----------------------------------------------
@@ -12,7 +12,7 @@ let%expect_test "" =
     Step 0:
       No answer,
       <
-        fresh (q) appendo Cons(1, Cons(2, Nil)) Cons(3, Nil) q,
+        fresh (q) appendo [1; 2] [3] q,
         { },
         Var counter: 0
       >
@@ -22,7 +22,7 @@ let%expect_test "" =
     Step 1:
       No answer,
       <
-        appendo Cons(1, Cons(2, Nil)) Cons(3, Nil) _.1,
+        appendo [1; 2] [3] _.1,
         { },
         Var counter: 1
       >
@@ -33,12 +33,12 @@ let%expect_test "" =
       No answer,
       mplus
         <
-          Cons(1, Cons(2, Nil)) === Nil &&& _.1 === Cons(3, Nil),
+          [1; 2] === [] &&& [3] === _.1,
           { },
           Var counter: 1
         >
         <
-          fresh (e xs xys) Cons(1, Cons(2, Nil)) === Cons(e, xs) &&& _.1 === Cons(e, xys) &&& appendo xs Cons(3, Nil) xys,
+          fresh (h t ab') [1; 2] === [h; t] &&& [h; ab'] === _.1 &&& appendo t [3] ab',
           { },
           Var counter: 1
         >
@@ -48,7 +48,7 @@ let%expect_test "" =
     Step 3:
       No answer,
       <
-        Cons(1, Cons(2, Nil)) === Cons(_.2, _.3) &&& _.1 === Cons(_.2, _.4) &&& appendo _.3 Cons(3, Nil) _.4,
+        [1; 2] === [_.2; _.3] &&& [_.2; _.4] === _.1 &&& appendo _.3 [3] _.4,
         { },
         Var counter: 4
       >
@@ -62,25 +62,25 @@ let%expect_test "" =
           mplus
             bind
               nil
-              _.1 === Cons(_.2, _.4)
+              [_.2; _.4] === _.1
             nil
-          appendo _.3 Cons(3, Nil) _.4
+          appendo _.3 [3] _.4
         mplus
           <
-            _.3 === Nil &&& _.4 === Cons(3, Nil),
+            _.3 === [] &&& [3] === _.4,
             {
-              _.1 <- Cons(_.2, _.4);
+              _.1 <- [_.2; _.4];
               _.2 <- 1;
-              _.3 <- Cons(2, Nil)
+              _.3 <- [2]
             },
             Var counter: 4
           >
           <
-            fresh (e xs xys) _.3 === Cons(e, xs) &&& _.4 === Cons(e, xys) &&& appendo xs Cons(3, Nil) xys,
+            fresh (h t ab') _.3 === [h; t] &&& [h; ab'] === _.4 &&& appendo t [3] ab',
             {
-              _.1 <- Cons(_.2, _.4);
+              _.1 <- [_.2; _.4];
               _.2 <- 1;
-              _.3 <- Cons(2, Nil)
+              _.3 <- [2]
             },
             Var counter: 4
           >
@@ -90,11 +90,11 @@ let%expect_test "" =
     Step 5:
       No answer,
       <
-        _.3 === Cons(_.5, _.6) &&& _.4 === Cons(_.5, _.7) &&& appendo _.6 Cons(3, Nil) _.7,
+        _.3 === [_.5; _.6] &&& [_.5; _.7] === _.4 &&& appendo _.6 [3] _.7,
         {
-          _.1 <- Cons(_.2, _.4);
+          _.1 <- [_.2; _.4];
           _.2 <- 1;
-          _.3 <- Cons(2, Nil)
+          _.3 <- [2]
         },
         Var counter: 7
       >
@@ -104,13 +104,13 @@ let%expect_test "" =
     Step 6:
       Answer:
         {
-          _.1 <- Cons(_.2, _.4);
+          _.1 <- [_.2; _.4];
           _.2 <- 1;
-          _.3 <- Cons(2, Nil);
-          _.4 <- Cons(_.5, _.7);
+          _.3 <- [2];
+          _.4 <- [_.5; _.7];
           _.5 <- 2;
-          _.6 <- Nil;
-          _.7 <- Cons(3, Nil)
+          _.6 <- [];
+          _.7 <- [3]
         },
         Var counter: 7,
       mplus
@@ -118,31 +118,31 @@ let%expect_test "" =
           mplus
             bind
               nil
-              _.4 === Cons(_.5, _.7)
+              [_.5; _.7] === _.4
             nil
-          appendo _.6 Cons(3, Nil) _.7
+          appendo _.6 [3] _.7
         mplus
           <
-            _.6 === Nil &&& _.7 === Cons(3, Nil),
+            _.6 === [] &&& [3] === _.7,
             {
-              _.1 <- Cons(_.2, _.4);
+              _.1 <- [_.2; _.4];
               _.2 <- 1;
-              _.3 <- Cons(2, Nil);
-              _.4 <- Cons(_.5, _.7);
+              _.3 <- [2];
+              _.4 <- [_.5; _.7];
               _.5 <- 2;
-              _.6 <- Nil
+              _.6 <- []
             },
             Var counter: 7
           >
           <
-            fresh (e xs xys) _.6 === Cons(e, xs) &&& _.7 === Cons(e, xys) &&& appendo xs Cons(3, Nil) xys,
+            fresh (h t ab') _.6 === [h; t] &&& [h; ab'] === _.7 &&& appendo t [3] ab',
             {
-              _.1 <- Cons(_.2, _.4);
+              _.1 <- [_.2; _.4];
               _.2 <- 1;
-              _.3 <- Cons(2, Nil);
-              _.4 <- Cons(_.5, _.7);
+              _.3 <- [2];
+              _.4 <- [_.5; _.7];
               _.5 <- 2;
-              _.6 <- Nil
+              _.6 <- []
             },
             Var counter: 7
           >
@@ -153,21 +153,21 @@ let%expect_test "" =
       No answer,
       mplus
         <
-          fresh (e xs xys) _.6 === Cons(e, xs) &&& _.7 === Cons(e, xys) &&& appendo xs Cons(3, Nil) xys,
+          fresh (h t ab') _.6 === [h; t] &&& [h; ab'] === _.7 &&& appendo t [3] ab',
           {
-            _.1 <- Cons(_.2, _.4);
+            _.1 <- [_.2; _.4];
             _.2 <- 1;
-            _.3 <- Cons(2, Nil);
-            _.4 <- Cons(_.5, _.7);
+            _.3 <- [2];
+            _.4 <- [_.5; _.7];
             _.5 <- 2;
-            _.6 <- Nil
+            _.6 <- []
           },
           Var counter: 7
         >
         mplus
           bind
             nil
-            _.7 === Cons(3, Nil)
+            [3] === _.7
           nil
 
     ----------------------------------------------
@@ -178,17 +178,17 @@ let%expect_test "" =
         mplus
           bind
             nil
-            _.7 === Cons(3, Nil)
+            [3] === _.7
           nil
         <
-          _.6 === Cons(_.8, _.9) &&& _.7 === Cons(_.8, _.10) &&& appendo _.9 Cons(3, Nil) _.10,
+          _.6 === [_.8; _.9] &&& [_.8; _.10] === _.7 &&& appendo _.9 [3] _.10,
           {
-            _.1 <- Cons(_.2, _.4);
+            _.1 <- [_.2; _.4];
             _.2 <- 1;
-            _.3 <- Cons(2, Nil);
-            _.4 <- Cons(_.5, _.7);
+            _.3 <- [2];
+            _.4 <- [_.5; _.7];
             _.5 <- 2;
-            _.6 <- Nil
+            _.6 <- []
           },
           Var counter: 10
         >
@@ -202,7 +202,7 @@ let%expect_test "" =
 let%expect_test "" =
   let open Examples in
   print_trace Ocanren_trace.eval [ appendo; reverso ] (-1)
-    (fresh [ "q" ] @@ invoke "reverso" [ list1; Var "q" ]);
+    (fresh [ "q" ] @@ invoke "reverso" [ Var "q"; list12 ]);
   [%expect
     {|
     ----------------------------------------------
@@ -210,7 +210,7 @@ let%expect_test "" =
     Step 0:
       No answer,
       <
-        fresh (q) reverso Cons(1, Cons(2, Nil)) q,
+        fresh (q) reverso q [1; 2],
         { },
         Var counter: 0
       >
@@ -220,7 +220,7 @@ let%expect_test "" =
     Step 1:
       No answer,
       <
-        reverso Cons(1, Cons(2, Nil)) _.1,
+        reverso _.1 [1; 2],
         { },
         Var counter: 1
       >
@@ -231,12 +231,12 @@ let%expect_test "" =
       No answer,
       mplus
         <
-          Cons(1, Cons(2, Nil)) === Nil &&& _.1 === Nil,
+          _.1 === [] &&& [1; 2] === [],
           { },
           Var counter: 1
         >
         <
-          fresh (e xs ys) Cons(1, Cons(2, Nil)) === Cons(e, xs) &&& reverso xs ys &&& appendo ys Cons(e, Nil) _.1,
+          fresh (h t a') _.1 === [h; t] &&& appendo a' [h] [1; 2] &&& reverso t a',
           { },
           Var counter: 1
         >
@@ -246,7 +246,7 @@ let%expect_test "" =
     Step 3:
       No answer,
       <
-        Cons(1, Cons(2, Nil)) === Cons(_.2, _.3) &&& reverso _.3 _.4 &&& appendo _.4 Cons(_.2, Nil) _.1,
+        _.1 === [_.2; _.3] &&& appendo _.4 [_.2] [1; 2] &&& reverso _.3 _.4,
         { },
         Var counter: 4
       >
@@ -259,25 +259,23 @@ let%expect_test "" =
         mplus
           bind
             nil
-            reverso _.3 _.4
+            appendo _.4 [_.2] [1; 2]
           mplus
             <
-              _.3 === Nil &&& _.4 === Nil,
+              _.4 === [] &&& [_.2] === [1; 2],
               {
-                _.2 <- 1;
-                _.3 <- Cons(2, Nil)
+                _.1 <- [_.2; _.3]
               },
               Var counter: 4
             >
             <
-              fresh (e xs ys) _.3 === Cons(e, xs) &&& reverso xs ys &&& appendo ys Cons(e, Nil) _.4,
+              fresh (h t ab') _.4 === [h; t] &&& [h; ab'] === [1; 2] &&& appendo t [_.2] ab',
               {
-                _.2 <- 1;
-                _.3 <- Cons(2, Nil)
+                _.1 <- [_.2; _.3]
               },
               Var counter: 4
             >
-        appendo _.4 Cons(_.2, Nil) _.1
+        reverso _.3 _.4
 
     ----------------------------------------------
 
@@ -285,146 +283,147 @@ let%expect_test "" =
       No answer,
       bind
         <
-          _.3 === Cons(_.5, _.6) &&& reverso _.6 _.7 &&& appendo _.7 Cons(_.5, Nil) _.4,
+          _.4 === [_.5; _.6] &&& [_.5; _.7] === [1; 2] &&& appendo _.6 [_.2] _.7,
           {
-            _.2 <- 1;
-            _.3 <- Cons(2, Nil)
+            _.1 <- [_.2; _.3]
           },
           Var counter: 7
         >
-        appendo _.4 Cons(_.2, Nil) _.1
+        reverso _.3 _.4
 
     ----------------------------------------------
 
     Step 6:
       No answer,
       bind
-        bind
-          mplus
-            bind
-              nil
-              reverso _.6 _.7
+        mplus
+          bind
             mplus
-              <
-                _.6 === Nil &&& _.7 === Nil,
-                {
-                  _.2 <- 1;
-                  _.3 <- Cons(2, Nil);
-                  _.5 <- 2;
-                  _.6 <- Nil
-                },
-                Var counter: 7
-              >
-              <
-                fresh (e xs ys) _.6 === Cons(e, xs) &&& reverso xs ys &&& appendo ys Cons(e, Nil) _.7,
-                {
-                  _.2 <- 1;
-                  _.3 <- Cons(2, Nil);
-                  _.5 <- 2;
-                  _.6 <- Nil
-                },
-                Var counter: 7
-              >
-          appendo _.7 Cons(_.5, Nil) _.4
-        appendo _.4 Cons(_.2, Nil) _.1
+              bind
+                nil
+                [_.5; _.7] === [1; 2]
+              nil
+            appendo _.6 [_.2] _.7
+          mplus
+            <
+              _.6 === [] &&& [_.2] === _.7,
+              {
+                _.1 <- [_.2; _.3];
+                _.4 <- [_.5; _.6];
+                _.5 <- 1;
+                _.7 <- [2]
+              },
+              Var counter: 7
+            >
+            <
+              fresh (h t ab') _.6 === [h; t] &&& [h; ab'] === _.7 &&& appendo t [_.2] ab',
+              {
+                _.1 <- [_.2; _.3];
+                _.4 <- [_.5; _.6];
+                _.5 <- 1;
+                _.7 <- [2]
+              },
+              Var counter: 7
+            >
+        reverso _.3 _.4
 
     ----------------------------------------------
 
     Step 7:
       No answer,
-      bind
-        mplus
-          bind
-            mplus
-              <
-                fresh (e xs ys) _.6 === Cons(e, xs) &&& reverso xs ys &&& appendo ys Cons(e, Nil) _.7,
-                {
-                  _.2 <- 1;
-                  _.3 <- Cons(2, Nil);
-                  _.5 <- 2;
-                  _.6 <- Nil
-                },
-                Var counter: 7
-              >
-              mplus
-                bind
-                  nil
-                  _.7 === Nil
-                nil
-            appendo _.7 Cons(_.5, Nil) _.4
+      mplus
+        bind
           mplus
             <
-              _.7 === Nil &&& _.4 === Cons(_.5, Nil),
+              fresh (h t ab') _.6 === [h; t] &&& [h; ab'] === _.7 &&& appendo t [_.2] ab',
               {
-                _.2 <- 1;
-                _.3 <- Cons(2, Nil);
-                _.5 <- 2;
-                _.6 <- Nil;
-                _.7 <- Nil
+                _.1 <- [_.2; _.3];
+                _.4 <- [_.5; _.6];
+                _.5 <- 1;
+                _.7 <- [2]
               },
               Var counter: 7
             >
-            <
-              fresh (e xs xys) _.7 === Cons(e, xs) &&& _.4 === Cons(e, xys) &&& appendo xs Cons(_.5, Nil) xys,
-              {
-                _.2 <- 1;
-                _.3 <- Cons(2, Nil);
-                _.5 <- 2;
-                _.6 <- Nil;
-                _.7 <- Nil
-              },
-              Var counter: 7
-            >
-        appendo _.4 Cons(_.2, Nil) _.1
+            mplus
+              bind
+                nil
+                [_.2] === _.7
+              nil
+          reverso _.3 _.4
+        mplus
+          <
+            _.3 === [] &&& _.4 === [],
+            {
+              _.1 <- [_.2; _.3];
+              _.2 <- 2;
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [];
+              _.7 <- [2]
+            },
+            Var counter: 7
+          >
+          <
+            fresh (h t a') _.3 === [h; t] &&& appendo a' [h] _.4 &&& reverso t a',
+            {
+              _.1 <- [_.2; _.3];
+              _.2 <- 2;
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [];
+              _.7 <- [2]
+            },
+            Var counter: 7
+          >
 
     ----------------------------------------------
 
     Step 8:
       No answer,
-      bind
+      mplus
         mplus
+          <
+            _.3 === [] &&& _.4 === [],
+            {
+              _.1 <- [_.2; _.3];
+              _.2 <- 2;
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [];
+              _.7 <- [2]
+            },
+            Var counter: 7
+          >
+          <
+            fresh (h t a') _.3 === [h; t] &&& appendo a' [h] _.4 &&& reverso t a',
+            {
+              _.1 <- [_.2; _.3];
+              _.2 <- 2;
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [];
+              _.7 <- [2]
+            },
+            Var counter: 7
+          >
+        bind
           mplus
-            <
-              _.7 === Nil &&& _.4 === Cons(_.5, Nil),
-              {
-                _.2 <- 1;
-                _.3 <- Cons(2, Nil);
-                _.5 <- 2;
-                _.6 <- Nil;
-                _.7 <- Nil
-              },
-              Var counter: 7
-            >
-            <
-              fresh (e xs xys) _.7 === Cons(e, xs) &&& _.4 === Cons(e, xys) &&& appendo xs Cons(_.5, Nil) xys,
-              {
-                _.2 <- 1;
-                _.3 <- Cons(2, Nil);
-                _.5 <- 2;
-                _.6 <- Nil;
-                _.7 <- Nil
-              },
-              Var counter: 7
-            >
-          bind
             mplus
-              mplus
-                bind
-                  nil
-                  _.7 === Nil
+              bind
                 nil
-              <
-                _.6 === Cons(_.8, _.9) &&& reverso _.9 _.10 &&& appendo _.10 Cons(_.8, Nil) _.7,
-                {
-                  _.2 <- 1;
-                  _.3 <- Cons(2, Nil);
-                  _.5 <- 2;
-                  _.6 <- Nil
-                },
-                Var counter: 10
-              >
-            appendo _.7 Cons(_.5, Nil) _.4
-        appendo _.4 Cons(_.2, Nil) _.1
+                [_.2] === _.7
+              nil
+            <
+              _.6 === [_.8; _.9] &&& [_.8; _.10] === _.7 &&& appendo _.9 [_.2] _.10,
+              {
+                _.1 <- [_.2; _.3];
+                _.4 <- [_.5; _.6];
+                _.5 <- 1;
+                _.7 <- [2]
+              },
+              Var counter: 10
+            >
+          reverso _.3 _.4
 
     ----------------------------------------------
 
@@ -433,117 +432,89 @@ let%expect_test "" =
       mplus
         bind
           mplus
-            bind
-              mplus
-                mplus
-                  bind
-                    nil
-                    _.7 === Nil
-                  nil
-                <
-                  _.6 === Cons(_.8, _.9) &&& reverso _.9 _.10 &&& appendo _.10 Cons(_.8, Nil) _.7,
-                  {
-                    _.2 <- 1;
-                    _.3 <- Cons(2, Nil);
-                    _.5 <- 2;
-                    _.6 <- Nil
-                  },
-                  Var counter: 10
-                >
-              appendo _.7 Cons(_.5, Nil) _.4
             mplus
-              <
-                fresh (e xs xys) _.7 === Cons(e, xs) &&& _.4 === Cons(e, xys) &&& appendo xs Cons(_.5, Nil) xys,
-                {
-                  _.2 <- 1;
-                  _.3 <- Cons(2, Nil);
-                  _.5 <- 2;
-                  _.6 <- Nil;
-                  _.7 <- Nil
-                },
-                Var counter: 7
-              >
-              mplus
-                bind
-                  nil
-                  _.4 === Cons(_.5, Nil)
+              bind
                 nil
-          appendo _.4 Cons(_.2, Nil) _.1
-        mplus
-          <
-            _.4 === Nil &&& _.1 === Cons(_.2, Nil),
-            {
-              _.2 <- 1;
-              _.3 <- Cons(2, Nil);
-              _.4 <- Cons(_.5, Nil);
-              _.5 <- 2;
-              _.6 <- Nil;
-              _.7 <- Nil
-            },
-            Var counter: 7
-          >
-          <
-            fresh (e xs xys) _.4 === Cons(e, xs) &&& _.1 === Cons(e, xys) &&& appendo xs Cons(_.2, Nil) xys,
-            {
-              _.2 <- 1;
-              _.3 <- Cons(2, Nil);
-              _.4 <- Cons(_.5, Nil);
-              _.5 <- 2;
-              _.6 <- Nil;
-              _.7 <- Nil
-            },
-            Var counter: 7
-          >
+                [_.2] === _.7
+              nil
+            <
+              _.6 === [_.8; _.9] &&& [_.8; _.10] === _.7 &&& appendo _.9 [_.2] _.10,
+              {
+                _.1 <- [_.2; _.3];
+                _.4 <- [_.5; _.6];
+                _.5 <- 1;
+                _.7 <- [2]
+              },
+              Var counter: 10
+            >
+          reverso _.3 _.4
+        <
+          _.3 === [_.8; _.9] &&& appendo _.10 [_.8] _.4 &&& reverso _.9 _.10,
+          {
+            _.1 <- [_.2; _.3];
+            _.2 <- 2;
+            _.4 <- [_.5; _.6];
+            _.5 <- 1;
+            _.6 <- [];
+            _.7 <- [2]
+          },
+          Var counter: 10
+        >
 
     ----------------------------------------------
 
     Step 10:
       No answer,
       mplus
-        mplus
-          <
-            _.4 === Nil &&& _.1 === Cons(_.2, Nil),
-            {
-              _.2 <- 1;
-              _.3 <- Cons(2, Nil);
-              _.4 <- Cons(_.5, Nil);
-              _.5 <- 2;
-              _.6 <- Nil;
-              _.7 <- Nil
-            },
-            Var counter: 7
-          >
-          <
-            fresh (e xs xys) _.4 === Cons(e, xs) &&& _.1 === Cons(e, xys) &&& appendo xs Cons(_.2, Nil) xys,
-            {
-              _.2 <- 1;
-              _.3 <- Cons(2, Nil);
-              _.4 <- Cons(_.5, Nil);
-              _.5 <- 2;
-              _.6 <- Nil;
-              _.7 <- Nil
-            },
-            Var counter: 7
-          >
+        <
+          _.3 === [_.8; _.9] &&& appendo _.10 [_.8] _.4 &&& reverso _.9 _.10,
+          {
+            _.1 <- [_.2; _.3];
+            _.2 <- 2;
+            _.4 <- [_.5; _.6];
+            _.5 <- 1;
+            _.6 <- [];
+            _.7 <- [2]
+          },
+          Var counter: 10
+        >
         bind
           mplus
-            mplus
-              bind
+            bind
+              mplus
+                bind
+                  nil
+                  [_.8; _.10] === _.7
                 nil
-                _.4 === Cons(_.5, Nil)
-              nil
-            <
-              _.7 === Cons(_.8, _.9) &&& _.4 === Cons(_.8, _.10) &&& appendo _.9 Cons(_.5, Nil) _.10,
-              {
-                _.2 <- 1;
-                _.3 <- Cons(2, Nil);
-                _.5 <- 2;
-                _.6 <- Nil;
-                _.7 <- Nil
-              },
-              Var counter: 10
-            >
-          appendo _.4 Cons(_.2, Nil) _.1
+              appendo _.9 [_.2] _.10
+            mplus
+              <
+                _.9 === [] &&& [_.2] === _.10,
+                {
+                  _.1 <- [_.2; _.3];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [_.8; _.9];
+                  _.7 <- [2];
+                  _.8 <- 2;
+                  _.10 <- []
+                },
+                Var counter: 10
+              >
+              <
+                fresh (h t ab') _.9 === [h; t] &&& [h; ab'] === _.10 &&& appendo t [_.2] ab',
+                {
+                  _.1 <- [_.2; _.3];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [_.8; _.9];
+                  _.7 <- [2];
+                  _.8 <- 2;
+                  _.10 <- []
+                },
+                Var counter: 10
+              >
+          reverso _.3 _.4
 
     ----------------------------------------------
 
@@ -552,147 +523,595 @@ let%expect_test "" =
       mplus
         bind
           mplus
-            mplus
-              bind
+            bind
+              mplus
+                bind
+                  nil
+                  [_.8; _.10] === _.7
                 nil
-                _.4 === Cons(_.5, Nil)
+              appendo _.9 [_.2] _.10
+            mplus
+              <
+                _.9 === [] &&& [_.2] === _.10,
+                {
+                  _.1 <- [_.2; _.3];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [_.8; _.9];
+                  _.7 <- [2];
+                  _.8 <- 2;
+                  _.10 <- []
+                },
+                Var counter: 10
+              >
+              <
+                fresh (h t ab') _.9 === [h; t] &&& [h; ab'] === _.10 &&& appendo t [_.2] ab',
+                {
+                  _.1 <- [_.2; _.3];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [_.8; _.9];
+                  _.7 <- [2];
+                  _.8 <- 2;
+                  _.10 <- []
+                },
+                Var counter: 10
+              >
+          reverso _.3 _.4
+        bind
+          mplus
+            bind
               nil
-            <
-              _.7 === Cons(_.8, _.9) &&& _.4 === Cons(_.8, _.10) &&& appendo _.9 Cons(_.5, Nil) _.10,
-              {
-                _.2 <- 1;
-                _.3 <- Cons(2, Nil);
-                _.5 <- 2;
-                _.6 <- Nil;
-                _.7 <- Nil
-              },
-              Var counter: 10
-            >
-          appendo _.4 Cons(_.2, Nil) _.1
-        <
-          _.4 === Cons(_.8, _.9) &&& _.1 === Cons(_.8, _.10) &&& appendo _.9 Cons(_.2, Nil) _.10,
-          {
-            _.2 <- 1;
-            _.3 <- Cons(2, Nil);
-            _.4 <- Cons(_.5, Nil);
-            _.5 <- 2;
-            _.6 <- Nil;
-            _.7 <- Nil
-          },
-          Var counter: 10
-        >
+              appendo _.10 [_.8] _.4
+            mplus
+              <
+                _.10 === [] &&& [_.8] === _.4,
+                {
+                  _.1 <- [_.2; _.3];
+                  _.2 <- 2;
+                  _.3 <- [_.8; _.9];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [];
+                  _.7 <- [2]
+                },
+                Var counter: 10
+              >
+              <
+                fresh (h t ab') _.10 === [h; t] &&& [h; ab'] === _.4 &&& appendo t [_.8] ab',
+                {
+                  _.1 <- [_.2; _.3];
+                  _.2 <- 2;
+                  _.3 <- [_.8; _.9];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [];
+                  _.7 <- [2]
+                },
+                Var counter: 10
+              >
+          reverso _.9 _.10
 
     ----------------------------------------------
 
     Step 12:
-      Answer:
-        {
-          _.1 <- Cons(_.8, _.10);
-          _.2 <- 1;
-          _.3 <- Cons(2, Nil);
-          _.4 <- Cons(_.5, Nil);
-          _.5 <- 2;
-          _.6 <- Nil;
-          _.7 <- Nil;
-          _.8 <- 2;
-          _.9 <- Nil;
-          _.10 <- Cons(_.2, Nil)
-        },
-        Var counter: 10,
+      No answer,
       mplus
         bind
           mplus
             bind
               nil
-              _.1 === Cons(_.8, _.10)
-            nil
-          appendo _.9 Cons(_.2, Nil) _.10
-        mplus
+              appendo _.10 [_.8] _.4
+            mplus
+              <
+                _.10 === [] &&& [_.8] === _.4,
+                {
+                  _.1 <- [_.2; _.3];
+                  _.2 <- 2;
+                  _.3 <- [_.8; _.9];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [];
+                  _.7 <- [2]
+                },
+                Var counter: 10
+              >
+              <
+                fresh (h t ab') _.10 === [h; t] &&& [h; ab'] === _.4 &&& appendo t [_.8] ab',
+                {
+                  _.1 <- [_.2; _.3];
+                  _.2 <- 2;
+                  _.3 <- [_.8; _.9];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [];
+                  _.7 <- [2]
+                },
+                Var counter: 10
+              >
+          reverso _.9 _.10
+        bind
           <
-            _.9 === Nil &&& _.10 === Cons(_.2, Nil),
+            _.9 === [_.11; _.12] &&& [_.11; _.13] === _.10 &&& appendo _.12 [_.2] _.13,
             {
-              _.1 <- Cons(_.8, _.10);
-              _.2 <- 1;
-              _.3 <- Cons(2, Nil);
-              _.4 <- Cons(_.5, Nil);
-              _.5 <- 2;
-              _.6 <- Nil;
-              _.7 <- Nil;
+              _.1 <- [_.2; _.3];
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [_.8; _.9];
+              _.7 <- [2];
               _.8 <- 2;
-              _.9 <- Nil
+              _.10 <- []
             },
-            Var counter: 10
+            Var counter: 13
           >
-          <
-            fresh (e xs xys) _.9 === Cons(e, xs) &&& _.10 === Cons(e, xys) &&& appendo xs Cons(_.2, Nil) xys,
-            {
-              _.1 <- Cons(_.8, _.10);
-              _.2 <- 1;
-              _.3 <- Cons(2, Nil);
-              _.4 <- Cons(_.5, Nil);
-              _.5 <- 2;
-              _.6 <- Nil;
-              _.7 <- Nil;
-              _.8 <- 2;
-              _.9 <- Nil
-            },
-            Var counter: 10
-          >
+          reverso _.3 _.4
 
     ----------------------------------------------
 
     Step 13:
       No answer,
       mplus
-        <
-          fresh (e xs xys) _.9 === Cons(e, xs) &&& _.10 === Cons(e, xys) &&& appendo xs Cons(_.2, Nil) xys,
-          {
-            _.1 <- Cons(_.8, _.10);
-            _.2 <- 1;
-            _.3 <- Cons(2, Nil);
-            _.4 <- Cons(_.5, Nil);
-            _.5 <- 2;
-            _.6 <- Nil;
-            _.7 <- Nil;
-            _.8 <- 2;
-            _.9 <- Nil
-          },
-          Var counter: 10
-        >
+        bind
+          <
+            _.9 === [_.11; _.12] &&& [_.11; _.13] === _.10 &&& appendo _.12 [_.2] _.13,
+            {
+              _.1 <- [_.2; _.3];
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [_.8; _.9];
+              _.7 <- [2];
+              _.8 <- 2;
+              _.10 <- []
+            },
+            Var counter: 13
+          >
+          reverso _.3 _.4
         mplus
           bind
-            nil
-            _.10 === Cons(_.2, Nil)
-          nil
+            mplus
+              <
+                fresh (h t ab') _.10 === [h; t] &&& [h; ab'] === _.4 &&& appendo t [_.8] ab',
+                {
+                  _.1 <- [_.2; _.3];
+                  _.2 <- 2;
+                  _.3 <- [_.8; _.9];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [];
+                  _.7 <- [2]
+                },
+                Var counter: 10
+              >
+              mplus
+                bind
+                  nil
+                  [_.8] === _.4
+                nil
+            reverso _.9 _.10
+          mplus
+            <
+              _.9 === [] &&& _.10 === [],
+              {
+                _.1 <- [_.2; _.3];
+                _.2 <- 2;
+                _.3 <- [_.8; _.9];
+                _.4 <- [_.5; _.6];
+                _.5 <- 1;
+                _.6 <- [];
+                _.7 <- [2];
+                _.8 <- 1;
+                _.10 <- []
+              },
+              Var counter: 10
+            >
+            <
+              fresh (h t a') _.9 === [h; t] &&& appendo a' [h] _.10 &&& reverso t a',
+              {
+                _.1 <- [_.2; _.3];
+                _.2 <- 2;
+                _.3 <- [_.8; _.9];
+                _.4 <- [_.5; _.6];
+                _.5 <- 1;
+                _.6 <- [];
+                _.7 <- [2];
+                _.8 <- 1;
+                _.10 <- []
+              },
+              Var counter: 10
+            >
 
     ----------------------------------------------
 
     Step 14:
-      No answer,
+      Answer:
+        {
+          _.1 <- [_.2; _.3];
+          _.2 <- 2;
+          _.3 <- [_.8; _.9];
+          _.4 <- [_.5; _.6];
+          _.5 <- 1;
+          _.6 <- [];
+          _.7 <- [2];
+          _.8 <- 1;
+          _.9 <- [];
+          _.10 <- []
+        },
+        Var counter: 10,
       mplus
         mplus
-          bind
-            nil
-            _.10 === Cons(_.2, Nil)
-          nil
-        <
-          _.9 === Cons(_.11, _.12) &&& _.10 === Cons(_.11, _.13) &&& appendo _.12 Cons(_.2, Nil) _.13,
-          {
-            _.1 <- Cons(_.8, _.10);
-            _.2 <- 1;
-            _.3 <- Cons(2, Nil);
-            _.4 <- Cons(_.5, Nil);
-            _.5 <- 2;
-            _.6 <- Nil;
-            _.7 <- Nil;
-            _.8 <- 2;
-            _.9 <- Nil
-          },
-          Var counter: 13
-        >
+          <
+            _.9 === [] &&& _.10 === [],
+            {
+              _.1 <- [_.2; _.3];
+              _.2 <- 2;
+              _.3 <- [_.8; _.9];
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [];
+              _.7 <- [2];
+              _.8 <- 1;
+              _.10 <- []
+            },
+            Var counter: 10
+          >
+          <
+            fresh (h t a') _.9 === [h; t] &&& appendo a' [h] _.10 &&& reverso t a',
+            {
+              _.1 <- [_.2; _.3];
+              _.2 <- 2;
+              _.3 <- [_.8; _.9];
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [];
+              _.7 <- [2];
+              _.8 <- 1;
+              _.10 <- []
+            },
+            Var counter: 10
+          >
+        bind
+          mplus
+            mplus
+              bind
+                nil
+                [_.8] === _.4
+              nil
+            <
+              _.10 === [_.11; _.12] &&& [_.11; _.13] === _.4 &&& appendo _.12 [_.8] _.13,
+              {
+                _.1 <- [_.2; _.3];
+                _.2 <- 2;
+                _.3 <- [_.8; _.9];
+                _.4 <- [_.5; _.6];
+                _.5 <- 1;
+                _.6 <- [];
+                _.7 <- [2]
+              },
+              Var counter: 13
+            >
+          reverso _.9 _.10
 
     ----------------------------------------------
 
     Step 15:
+      No answer,
+      mplus
+        bind
+          mplus
+            mplus
+              bind
+                nil
+                [_.8] === _.4
+              nil
+            <
+              _.10 === [_.11; _.12] &&& [_.11; _.13] === _.4 &&& appendo _.12 [_.8] _.13,
+              {
+                _.1 <- [_.2; _.3];
+                _.2 <- 2;
+                _.3 <- [_.8; _.9];
+                _.4 <- [_.5; _.6];
+                _.5 <- 1;
+                _.6 <- [];
+                _.7 <- [2]
+              },
+              Var counter: 13
+            >
+          reverso _.9 _.10
+        mplus
+          <
+            fresh (h t a') _.9 === [h; t] &&& appendo a' [h] _.10 &&& reverso t a',
+            {
+              _.1 <- [_.2; _.3];
+              _.2 <- 2;
+              _.3 <- [_.8; _.9];
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [];
+              _.7 <- [2];
+              _.8 <- 1;
+              _.10 <- []
+            },
+            Var counter: 10
+          >
+          mplus
+            bind
+              nil
+              _.10 === []
+            nil
+
+    ----------------------------------------------
+
+    Step 16:
+      No answer,
+      mplus
+        mplus
+          <
+            fresh (h t a') _.9 === [h; t] &&& appendo a' [h] _.10 &&& reverso t a',
+            {
+              _.1 <- [_.2; _.3];
+              _.2 <- 2;
+              _.3 <- [_.8; _.9];
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [];
+              _.7 <- [2];
+              _.8 <- 1;
+              _.10 <- []
+            },
+            Var counter: 10
+          >
+          mplus
+            bind
+              nil
+              _.10 === []
+            nil
+        bind
+          mplus
+            bind
+              mplus
+                bind
+                  nil
+                  [_.11; _.13] === _.4
+                nil
+              appendo _.12 [_.8] _.13
+            mplus
+              <
+                _.12 === [] &&& [_.8] === _.13,
+                {
+                  _.1 <- [_.2; _.3];
+                  _.2 <- 2;
+                  _.3 <- [_.8; _.9];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [];
+                  _.7 <- [2];
+                  _.10 <- [_.11; _.12];
+                  _.11 <- 1;
+                  _.13 <- []
+                },
+                Var counter: 13
+              >
+              <
+                fresh (h t ab') _.12 === [h; t] &&& [h; ab'] === _.13 &&& appendo t [_.8] ab',
+                {
+                  _.1 <- [_.2; _.3];
+                  _.2 <- 2;
+                  _.3 <- [_.8; _.9];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [];
+                  _.7 <- [2];
+                  _.10 <- [_.11; _.12];
+                  _.11 <- 1;
+                  _.13 <- []
+                },
+                Var counter: 13
+              >
+          reverso _.9 _.10
+
+    ----------------------------------------------
+
+    Step 17:
+      No answer,
+      mplus
+        bind
+          mplus
+            bind
+              mplus
+                bind
+                  nil
+                  [_.11; _.13] === _.4
+                nil
+              appendo _.12 [_.8] _.13
+            mplus
+              <
+                _.12 === [] &&& [_.8] === _.13,
+                {
+                  _.1 <- [_.2; _.3];
+                  _.2 <- 2;
+                  _.3 <- [_.8; _.9];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [];
+                  _.7 <- [2];
+                  _.10 <- [_.11; _.12];
+                  _.11 <- 1;
+                  _.13 <- []
+                },
+                Var counter: 13
+              >
+              <
+                fresh (h t ab') _.12 === [h; t] &&& [h; ab'] === _.13 &&& appendo t [_.8] ab',
+                {
+                  _.1 <- [_.2; _.3];
+                  _.2 <- 2;
+                  _.3 <- [_.8; _.9];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [];
+                  _.7 <- [2];
+                  _.10 <- [_.11; _.12];
+                  _.11 <- 1;
+                  _.13 <- []
+                },
+                Var counter: 13
+              >
+          reverso _.9 _.10
+        mplus
+          mplus
+            bind
+              nil
+              _.10 === []
+            nil
+          <
+            _.9 === [_.11; _.12] &&& appendo _.13 [_.11] _.10 &&& reverso _.12 _.13,
+            {
+              _.1 <- [_.2; _.3];
+              _.2 <- 2;
+              _.3 <- [_.8; _.9];
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [];
+              _.7 <- [2];
+              _.8 <- 1;
+              _.10 <- []
+            },
+            Var counter: 13
+          >
+
+    ----------------------------------------------
+
+    Step 18:
+      No answer,
+      mplus
+        mplus
+          mplus
+            bind
+              nil
+              _.10 === []
+            nil
+          <
+            _.9 === [_.11; _.12] &&& appendo _.13 [_.11] _.10 &&& reverso _.12 _.13,
+            {
+              _.1 <- [_.2; _.3];
+              _.2 <- 2;
+              _.3 <- [_.8; _.9];
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [];
+              _.7 <- [2];
+              _.8 <- 1;
+              _.10 <- []
+            },
+            Var counter: 13
+          >
+        bind
+          <
+            _.12 === [_.14; _.15] &&& [_.14; _.16] === _.13 &&& appendo _.15 [_.8] _.16,
+            {
+              _.1 <- [_.2; _.3];
+              _.2 <- 2;
+              _.3 <- [_.8; _.9];
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [];
+              _.7 <- [2];
+              _.10 <- [_.11; _.12];
+              _.11 <- 1;
+              _.13 <- []
+            },
+            Var counter: 16
+          >
+          reverso _.9 _.10
+
+    ----------------------------------------------
+
+    Step 19:
+      No answer,
+      mplus
+        bind
+          <
+            _.12 === [_.14; _.15] &&& [_.14; _.16] === _.13 &&& appendo _.15 [_.8] _.16,
+            {
+              _.1 <- [_.2; _.3];
+              _.2 <- 2;
+              _.3 <- [_.8; _.9];
+              _.4 <- [_.5; _.6];
+              _.5 <- 1;
+              _.6 <- [];
+              _.7 <- [2];
+              _.10 <- [_.11; _.12];
+              _.11 <- 1;
+              _.13 <- []
+            },
+            Var counter: 16
+          >
+          reverso _.9 _.10
+        bind
+          mplus
+            bind
+              nil
+              appendo _.13 [_.11] _.10
+            mplus
+              <
+                _.13 === [] &&& [_.11] === _.10,
+                {
+                  _.1 <- [_.2; _.3];
+                  _.2 <- 2;
+                  _.3 <- [_.8; _.9];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [];
+                  _.7 <- [2];
+                  _.8 <- 1;
+                  _.9 <- [_.11; _.12];
+                  _.10 <- []
+                },
+                Var counter: 13
+              >
+              <
+                fresh (h t ab') _.13 === [h; t] &&& [h; ab'] === _.10 &&& appendo t [_.11] ab',
+                {
+                  _.1 <- [_.2; _.3];
+                  _.2 <- 2;
+                  _.3 <- [_.8; _.9];
+                  _.4 <- [_.5; _.6];
+                  _.5 <- 1;
+                  _.6 <- [];
+                  _.7 <- [2];
+                  _.8 <- 1;
+                  _.9 <- [_.11; _.12];
+                  _.10 <- []
+                },
+                Var counter: 13
+              >
+          reverso _.12 _.13
+
+    ----------------------------------------------
+
+    Step 20:
+      No answer,
+      bind
+        <
+          _.13 === [_.14; _.15] &&& [_.14; _.16] === _.10 &&& appendo _.15 [_.11] _.16,
+          {
+            _.1 <- [_.2; _.3];
+            _.2 <- 2;
+            _.3 <- [_.8; _.9];
+            _.4 <- [_.5; _.6];
+            _.5 <- 1;
+            _.6 <- [];
+            _.7 <- [2];
+            _.8 <- 1;
+            _.9 <- [_.11; _.12];
+            _.10 <- []
+          },
+          Var counter: 16
+        >
+        reverso _.12 _.13
+
+    ----------------------------------------------
+
+    Step 21:
       No answer,
       nil |}]

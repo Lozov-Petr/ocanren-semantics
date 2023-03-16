@@ -11,3 +11,8 @@
  (name State)
  (modules state)
  (libraries Substitution))
+
+(library
+ (name Examples)
+ (modules examples)
+ (libraries Stream Substitution))

@@ -1,0 +1,20 @@
+(library
+ (name Eval)
+ (modules eval_trace trace_test)
+ (libraries State Goal Types Examples)
+ (preprocess
+  (pps ppx_inline_test ppx_expect))
+ (inline_tests))
+
+(library
+ (name Types)
+ (modules types)
+ (libraries State Goal))
+
+(executable
+ (name unify_test)
+ (modules unify_test)
+ (libraries Eval Examples))
+
+(cram
+ (deps ./unify_test.exe))

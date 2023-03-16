@@ -26,8 +26,3 @@
  (name Stream)
  (modules stream)
  (libraries Substitution State Goal))
-
-(library
- (name Examples)
- (modules examples)
- (libraries Stream Substitution))
